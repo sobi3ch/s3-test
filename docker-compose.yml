@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  master:
+    image: s3-master
+    build: ./master
+    volumes:
+      - ./semafors:/semafors
+
+  mysql:
+    image: s3-mysql
+    build: ./mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./semafors:/semafors
+      
+  nginx:
+    image: s3-nginx
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/app:/code
+      - ./nginx/site.conf:/etc/nginx/conf.d/default.conf
+      - ./semafors:/semafors
+    links:
+      - php
+  
+  php:
+    image: s3-php
+    build: ./php
+    volumes:
+      - ./nginx/app:/code
+      - ./semafors:/semafors
